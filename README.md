@@ -184,7 +184,7 @@ OmniSight AI is implemented as a **web platform** to ensure:
 
 # Scope & Exclusions
 
-### ✅ Covered
+### Covered
 Loss of income caused by **external disruptions**, including:
 
 - Extreme weather
