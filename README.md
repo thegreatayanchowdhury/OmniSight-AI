@@ -87,6 +87,14 @@ Instead of requiring manual claims, **payouts are automatically triggered when p
 
 ---
 
+## Key Innovation
+
+OmniSight AI introduces **Parametric Income Protection for Gig Workers**, where payouts are triggered automatically based on real-world disruption data rather than manual claims.
+
+This eliminates traditional insurance delays and ensures gig workers receive **instant financial protection during disruptions.**
+
+---
+
 # Key Features
 
 ## Parametric Automation (Zero-Touch Claims)
@@ -294,6 +302,16 @@ OmniSight AI aims to create **financial resilience for India's gig workforce** b
 - Fast parametric payouts  
 
 The goal is to **empower delivery partners with financial stability**, ensuring that **external disruptions never translate into financial insecurity**.
+
+---
+
+# Impact
+
+If deployed at scale, OmniSight AI could protect:
+
+- **10M+ gig workers in India**
+- Prevent **20–30% income volatility**
+- Provide **real-time financial resilience**
 
 ---
 
