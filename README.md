@@ -20,6 +20,27 @@ It focuses on delivery partners working across **food delivery, e-commerce, and 
 
 ---
 
+## Table of Contents
+
+- Problem Statement
+- Target Persona
+- Our Solution
+- Key Innovation
+- Key Features
+- AI & ML Workflow
+- Financial Model
+- Platform Design
+- System Architecture
+- Tech Stack
+- System Workflow
+- Scope & Exclusions
+- Vision
+- Impact
+- Future Enhancements
+- License
+
+---
+
 ## Problem Statement
 
 India’s platform-based delivery partners working with platforms such as **Zomato, Swiggy, Zepto, Amazon, Dunzo, and others** form the backbone of the digital economy.
@@ -327,5 +348,5 @@ If deployed at scale, OmniSight AI could protect:
 # License
 
 This project is developed for **innovation and research purposes** and can be extended into a production-grade system with regulatory approvals.
-
+MIT License
 ---
