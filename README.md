@@ -7,9 +7,6 @@
 ![AI](https://img.shields.io/badge/AI-ML-orange)
 ![Status](https://img.shields.io/badge/Status-Hackathon%20Prototype-purple)
 ![Contributions](https://img.shields.io/badge/Contributions-Welcome-brightgreen)
-![React](https://img.shields.io/badge/Frontend-React-blue)
-![FastAPI](https://img.shields.io/badge/Backend-FastAPI-green)
-![Python](https://img.shields.io/badge/Language-Python-yellow)
 ![Scikit-Learn](https://img.shields.io/badge/ML-ScikitLearn-orange)
 ![SQL](https://img.shields.io/badge/Database-SQL-lightgrey)
 
