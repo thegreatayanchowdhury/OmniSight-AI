@@ -9,7 +9,7 @@ const HeroSection = () => {
 
       <nav className="fixed top-0 left-0 w-full z-50 backdrop-blur-xl bg-black/40 border-b border-white/10 shadow-lg">
         <div className="absolute inset-0 -z-10 bg-gradient-to-r from-emerald-500/10 via-green-400/10 to-emerald-600/10 blur-2xl"></div>
-        <div className="flex items-center justify-between px-6 py-4 container mx-auto">
+        <div className="flex items-center justify-between px-6 pt-4 pb-3 container mx-auto">
           {/* Logo */}
           <div className="flex items-center gap-3 cursor-pointer">
             <img
