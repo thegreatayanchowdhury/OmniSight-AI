@@ -251,7 +251,7 @@ I --> K[Weekly Payout System]
 ```
 
 ---
-
+## Entity-Relationship Diagram (ERD)
 ![OmniSight AI Entity-Relationship Diagram (ERD)](docs/ERDiagram.png)
 
 ---
