@@ -252,6 +252,10 @@ I --> K[Weekly Payout System]
 
 ---
 
+![OmniSight AI Entity-Relationship Diagram (ERD)](docs/ERDiagram.png)
+
+---
+
 # Tech Stack
 
 ## Frontend
