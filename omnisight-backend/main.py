@@ -14,7 +14,7 @@ app = FastAPI(title="OmniSight AI API")
 origins = [
     "http://localhost:5173",          # Local Vite Development
     "http://localhost:3000",
-    "https://omni-sight-ai.vercel.app/" # Vercel Frontend
+    "https://omni-sight-ai.vercel.app", # Vercel Frontend
 ]
 
 app.add_middleware(
