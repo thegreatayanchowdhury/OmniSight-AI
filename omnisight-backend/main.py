@@ -4,11 +4,10 @@ from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 import models, schemas, auth
 from database import SessionLocal, engine
-from typing import List
 
 app = FastAPI(title="OmniSight AI API")
 
-# --- STARTUP EVENT (FIXED) ---
+# --- STARTUP EVENT ---
 @app.on_event("startup")
 def startup():
     try:
@@ -20,7 +19,7 @@ def startup():
 # --- CORS CONFIGURATION ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # you can restrict later
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -49,22 +48,35 @@ def get_db():
 def home():
     return {"status": "online", "message": "OmniSight AI Protocol Operational"}
 
+# ✅ FIXED SIGNUP
 @app.post("/signup", status_code=status.HTTP_201_CREATED)
 def signup(user: schemas.UserSignup, db: Session = Depends(get_db)):
+    # Basic validations
     if not user.password or user.password.strip() == "":
         raise HTTPException(status_code=400, detail="Password cannot be empty")
     
     if len(user.password) < 6:
         raise HTTPException(status_code=400, detail="Password too short")
 
+    # 🔥 FIX: bcrypt max length check
+    if len(user.password.encode("utf-8")) > 72:
+        raise HTTPException(
+            status_code=400,
+            detail="Password too long (max 72 characters)"
+        )
+
+    # Check existing user
     existing_user = db.query(models.User).filter(models.User.email == user.email).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
 
+    # 🔥 SAFE HASHING (truncate just in case)
+    hashed_password = auth.hash_password(user.password[:72])
+
     new_user = models.User(
         name=user.name,
         email=user.email,
-        password=auth.hash_password(user.password),
+        password=hashed_password,
         role=user.role if user.role else "client"
     )
 
@@ -74,6 +86,7 @@ def signup(user: schemas.UserSignup, db: Session = Depends(get_db)):
 
     return {"message": "Account created successfully"}
 
+# LOGIN
 @app.post("/login")
 def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(models.User.email == user.email).first()
@@ -98,7 +111,7 @@ def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
 
 @app.get("/client/dashboard-stats")
 def get_client_stats(
-    current_user = Depends(auth.require_role("client")),
+    current_user=Depends(auth.require_role("client")),
     db: Session = Depends(get_db)
 ):
     return {
@@ -113,7 +126,7 @@ def get_client_stats(
 
 @app.get("/admin/system-status")
 def get_admin_stats(
-    current_user = Depends(auth.require_role("admin"))
+    current_user=Depends(auth.require_role("admin"))
 ):
     return {
         "total_partners": 12402,
@@ -126,7 +139,7 @@ def get_admin_stats(
 def trigger_disruption(
     zone: str,
     trigger_type: str,
-    current_user = Depends(auth.require_role("admin"))
+    current_user=Depends(auth.require_role("admin"))
 ):
     return {
         "status": "triggered",
