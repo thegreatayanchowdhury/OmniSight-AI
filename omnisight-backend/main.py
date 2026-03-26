@@ -52,7 +52,7 @@ def get_db():
 def home():
     return {"status": "online", "message": "OmniSight AI Protocol Operational"}
 
-# ✅ SIGNUP
+# SIGNUP
 @app.post("/signup", status_code=status.HTTP_201_CREATED)
 def signup(user: schemas.UserSignup, db: Session = Depends(get_db)):
     # validations
@@ -67,7 +67,6 @@ def signup(user: schemas.UserSignup, db: Session = Depends(get_db)):
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
 
-    # ✅ SAFE HASHING (SHA256 + bcrypt)
     hashed_password = auth.hash_password(user.password)
 
     new_user = models.User(
@@ -83,7 +82,7 @@ def signup(user: schemas.UserSignup, db: Session = Depends(get_db)):
 
     return {"message": "Account created successfully"}
 
-# ✅ LOGIN
+# LOGIN
 @app.post("/login")
 def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(models.User.email == user.email).first()

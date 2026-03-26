@@ -30,8 +30,9 @@ function App() {
               }
             />
             <Route path="/auth" element={<AuthPage />} />
-            <Route path="/dashboard" element={<ClientDashboard />} />
-            <Route path="/admin" element={<AdminDashboard />} />
+           <Route path="/client/dashboard" element={<ClientDashboard />} />
+<Route path="/admin/dashboard" element={<AdminDashboard />} />
+            
           </Routes>
         </Router>
       )}
