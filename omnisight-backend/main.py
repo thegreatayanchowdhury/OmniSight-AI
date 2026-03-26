@@ -36,6 +36,7 @@ def get_db():
 # --- ROUTES ---
 
 @app.get("/")
+@app.head("/")
 def home():
     return {"status": "online", "message": "OmniSight AI Protocol Operational"}
 
