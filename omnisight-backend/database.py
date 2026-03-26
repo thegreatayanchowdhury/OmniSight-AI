@@ -1,21 +1,26 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
 import os
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
-if os.environ.get("RENDER"):
-    SQLALCHEMY_DATABASE_URL = "sqlite:////tmp/omnisight.db"
-else:
+# Note: Clever Cloud provides MYSQL_ADDON_URI
+SQLALCHEMY_DATABASE_URL = os.getenv("MYSQL_ADDON_URI")
+
+if not SQLALCHEMY_DATABASE_URL:
+    # Local fallback so you can still work on Linux Mint offline
     SQLALCHEMY_DATABASE_URL = "sqlite:///./omnisight.db"
 
-# # This creates a local file named omnisight.db in your backend folder
-# SQLALCHEMY_DATABASE_URL = "sqlite:///./omnisight.db"
-
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, 
-    # check_same_thread is ONLY needed for SQLite
-    connect_args={"check_same_thread": False}
-)
+# MySQL requires a specific driver (pymysql), SQLite does not
+if SQLALCHEMY_DATABASE_URL.startswith("mysql"):
+    # Ensure the URI starts with mysql+pymysql://
+    if not SQLALCHEMY_DATABASE_URL.startswith("mysql+pymysql://"):
+        SQLALCHEMY_DATABASE_URL = SQLALCHEMY_DATABASE_URL.replace("mysql://", "mysql+pymysql://")
+    engine = create_engine(SQLALCHEMY_DATABASE_URL)
+else:
+    # SQLite specific config
+    engine = create_engine(
+        SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+    )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
 Base = declarative_base()
