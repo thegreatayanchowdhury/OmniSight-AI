@@ -19,8 +19,11 @@ def startup():
 # --- CORS CONFIGURATION ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # you can restrict later
-    allow_credentials=False,
+    allow_origins=[
+        "http://localhost:5173",
+        "https://omni-sight-ai.vercel.app"
+    ],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
