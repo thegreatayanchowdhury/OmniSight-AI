@@ -5,7 +5,8 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String)
-    email = Column(String, unique=True, index=True)
-    password = Column(String)
-    role = Column(String)
+    # MySQL requires a length for VARCHAR columns
+    name = Column(String(100)) 
+    email = Column(String(255), unique=True, index=True)
+    password = Column(String(255))
+    role = Column(String(50))
