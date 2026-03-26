@@ -21,7 +21,9 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
-        "https://omni-sight-ai.vercel.app"
+        "https://omni-sight-ai.vercel.app",
+        "https://omni-sight-ai-seven.vercel.app/"
+
     ],
     allow_credentials=True,
     allow_methods=["*"],
