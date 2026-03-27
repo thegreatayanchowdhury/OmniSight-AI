@@ -743,3 +743,36 @@ If deployed at scale, OmniSight AI could protect:
 This project is developed for **innovation and research purposes** and can be extended into a production-grade system with regulatory approvals.
 MIT License
 ---
+
+---
+
+## Phase 1 Update (Model 1 - Risk Prediction)
+
+Phase 1 for Model 1 is now implemented under:
+
+- `omnisight-backend/model-risk-prediction`
+
+What is included:
+
+- Feature engineering pipeline
+- XGBoost training pipeline
+- LightGBM validation cross-check
+- Weekly risk scoring output generation
+- FastAPI routes for plans + risk score outputs
+
+Quick run:
+
+```powershell
+cd "omnisight-backend/model-risk-prediction"
+python -m src.risk_model.pipeline.weekly_job --generate-sample-if-missing
+python -m uvicorn api.app:app --host 127.0.0.1 --port 50560
+```
+
+Useful endpoints:
+
+- `GET /plans`
+- `GET /plans/compare/table`
+- `GET /plans/{plan_id}`
+- `GET /risk/latest`
+- `GET /risk/zones/{zone_id}`
+- `GET /health`
