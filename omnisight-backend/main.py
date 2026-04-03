@@ -154,3 +154,10 @@ def get_insurance_quote(city: str, tier: str, income: float):
         "coverage_limit": income * 7,
         "billing_cycle": "Weekly"
     }
+
+# for tiered payout testing
+# @app.post("/test-trigger-rain")
+# def test_trigger(mm_rainfall: float, db: Session = Depends(get_db)):
+#     # Simulate a 55mm rainstorm in Delhi
+#     result = process_automated_triggers(db, "Delhi", "Rainfall", mm_rainfall)
+#     return {"message": result}
