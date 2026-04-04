@@ -48,13 +48,12 @@ def process_payout(disruption_type: str, value: float):
 
             avg_income = user.avg_daily_income or 500
 
-            payout_amount = calculate_payout_amount(
-                avg_income,
-                tier["percent"]
+            payout_amount = (
+            Decimal(avg_income) * Decimal(tier["percent"]) / Decimal(100)
             )
 
             print(f"Before: {user.balance}")
-            user.balance += payout_amount
+            user.balance = (user.balance or 0) + payout_amount
             print(f"After: {user.balance}")
 
             print(
@@ -72,9 +71,7 @@ def process_payout(disruption_type: str, value: float):
             )
 
             db.add(payout_record)  # ✅ inside loop
-
-
-        db.commit()
+            db.commit()
 
     except Exception as e:
         print("Payout error:", e)
