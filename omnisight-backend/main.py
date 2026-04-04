@@ -53,7 +53,7 @@ async def global_exception_handler(request, exc):
     print("❌ ERROR:", exc)  # for debugging logs
     return JSONResponse(
         status_code=500,
-        content={"detail": "Internal Server Error"},
+        content={"detail": str(exc)},
     )
 
 # --- DB Dependency ---
@@ -93,6 +93,10 @@ def signup(user: schemas.UserSignup, db: Session = Depends(get_db)):
         email=user.email,
         password=hashed_password,
         role=user.role if user.role else "client"
+        balance=0,                 
+        city="Asansol",            
+        avg_daily_income=500.0,      
+        activity_tier="silver" 
     )
 
     db.add(new_user)
