@@ -12,19 +12,42 @@ const AuthPage = () => {
 
   const navigate = useNavigate();
 
-  // ✅ Redirect if already logged in
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    const role = localStorage.getItem("role");
+  // // ✅ Redirect if already logged in
+  // useEffect(() => {
+  //   const token = localStorage.getItem("token");
+  //   const role = localStorage.getItem("role");
 
-    if (token) {
-      if (role === "admin") {
-        navigate("/admin/dashboard");
-      } else {
-        navigate("/client/dashboard");
-      }
-    }
-  }, []);
+  //   if (token) {
+  //     if (role === "admin") {
+  //       navigate("/admin/dashboard");
+  //     } else {
+  //       navigate("/client/dashboard");
+  //     }
+  //   }
+  // }, []);
+
+  const [open, setOpen] = useState(false);
+
+useEffect(() => {
+  const token = localStorage.getItem("token");
+  if (token) setOpen(true);
+}, []);
+
+
+const handleContinue = () => {
+  const role = localStorage.getItem("role");
+
+  if (role === "admin") {
+    navigate("/admin/dashboard");
+  } else {
+    navigate("/client/dashboard");
+  }
+};
+
+const handleLogout = () => {
+  localStorage.clear();
+  setOpen(false);
+};
 
   // ✅ SINGLE clean handleSubmit
   const handleSubmit = async (e) => {
@@ -189,6 +212,36 @@ const AuthPage = () => {
           </div>
         </div>
       </div>
+      {open && (
+  <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+    <div className="bg-[#0f0f0f] border border-white/10 rounded-2xl p-6 w-80 text-center shadow-2xl">
+      
+      <h2 className="text-xl font-semibold text-white mb-2">
+        Already Logged In
+      </h2>
+
+      <p className="text-gray-400 mb-5">
+        Continue to dashboard or logout?
+      </p>
+
+      <div className="flex justify-center gap-3">
+        <button
+          onClick={handleLogout}
+          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+        >
+          Logout
+        </button>
+
+        <button
+          onClick={handleContinue}
+          className="px-4 py-2 bg-emerald-500 text-black rounded-lg hover:bg-emerald-400"
+        >
+          Continue
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 };
