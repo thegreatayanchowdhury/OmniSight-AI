@@ -17,11 +17,19 @@ import requests
 import random
 import logging
 import time
+import threading
 
 from payout_logic import process_payout
 import time, uuid, random
 from fastapi import HTTPException
 app = FastAPI(title="OmniSight AI API")
+
+aqi_result_store = {
+    "aqi": None,
+    "breached": None,
+    "payout": None,
+    "last_updated": None
+}
 AQI_THRESHOLD = 250
 logging.basicConfig(level=logging.INFO)
 # --- STARTUP EVENT ---
@@ -275,30 +283,50 @@ def fetch_aqi(city: str = "Asansol"):
         return random.randint(100, 400)
     
 
+def delayed_aqi_process(city: str = "Asansol"):
+    try:
+        time.sleep(150)
+
+        aqi = fetch_aqi(city)
+        breached = aqi > AQI_THRESHOLD
+
+        payout_info = None
+
+        if breached:
+            logging.warning("Threshold breached")
+            payout_status = process_payout("AQI", aqi)
+
+            payout_info = {
+                "type": "AQI",
+                "value": aqi,
+                "status": payout_status
+            }
+
+        # ✅ store result
+        aqi_result_store.update({
+            "aqi": aqi,
+            "breached": breached,
+            "payout": payout_info,
+            "last_updated": datetime.now().isoformat()
+        })
+
+        logging.info(f"AQI stored: {aqi}")
+
+    except Exception as e:
+        logging.error(f"AQI Background Error: {e}")
+
+
 @app.get("/aqi")
-def run_oracle():
+def run_oracle(city: str = "Asansol"):
 
-    time.sleep(150)  # change to 300 in production
+    # start background process
+    thread = threading.Thread(target=delayed_aqi_process, args=(city,))
+    thread.daemon = True
+    thread.start()
 
-    aqi = fetch_aqi()
-    breached = aqi > AQI_THRESHOLD
-
-    payout_info = None
-
-    if breached:
-        logging.warning("Threshold breached")
-        payout_result = process_payout("AQI", aqi)
-
-        payout_info = {
-            "type": "AQI",
-            "value": aqi,
-            "status": payout_result
-        }
-
+    # return latest available result instantly
     return {
         "success": True,
-        "aqi": aqi,
-        "threshold": AQI_THRESHOLD,
-        "breached": breached,
-        "payout": payout_info
+        "message": "AQI check scheduled",
+        "data": aqi_result_store
     }
