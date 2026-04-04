@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import { getClientData, getPayoutHistory } from "./apis/dashboard";
+import PayoutModal from './PayoutModal';
 
 import { 
   Shield, 
@@ -26,6 +27,8 @@ const ClientDashboard = () => {
   balance: "₹0",
   zone: "Loading..."
 });
+
+const [open, setOpen] = useState(false);
 
 const [activities, setActivities] = useState([]);
 
@@ -217,7 +220,20 @@ const handleLogout = () => {
             ))}
           </div>
         </div>
+<div className="bg-omni-dark-card p-6 rounded-2xl mt-6">
+  <h3 className="text-lg font-bold mb-3">Quick Actions</h3>
 
+  <button
+    onClick={() => setOpen(true)}
+    className="w-full bg-emerald-500 text-black py-3 rounded-xl font-semibold"
+  >
+    Withdraw Earnings 💸
+  </button>
+</div>
+<PayoutModal
+  isOpen={open}
+  onClose={() => setOpen(false)}
+/>
       </main>
     </div>
   );

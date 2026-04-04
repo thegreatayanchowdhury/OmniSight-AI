@@ -12,6 +12,8 @@ import threading
 from models import Base
 from database import engine
 
+import time, uuid, random
+from fastapi import HTTPException
 app = FastAPI(title="OmniSight AI API")
 
 # --- STARTUP EVENT ---
@@ -191,3 +193,31 @@ def get_insurance_quote(city: str, tier: str, income: float):
         "coverage_limit": income * 7,
         "billing_cycle": "Weekly"
     }
+
+
+
+@app.post("/simulate-payout")
+def simulate_payout(
+    data: schemas.PayoutRequest,
+    current_user=Depends(auth.require_role("client"))
+):
+    try:
+        time.sleep(2)
+
+        txn_id = str(uuid.uuid4())
+
+        # 🎲 Random success simulation
+        fake_bank = random.choice(["HDFC Bank", "SBI", "ICICI", "Axis Bank"])
+        processing_time = random.randint(1, 3)
+
+        return {
+            "status": "success",
+            "message": f"₹{data.amount} sent to {data.upi_id}",
+            "transaction_id": txn_id,
+            "bank": fake_bank,
+            "time_taken": f"{processing_time} sec"
+        }
+
+    except Exception as e:
+        print("PAYOUT ERROR:", e)
+        raise HTTPException(status_code=500, detail="Payout failed")
