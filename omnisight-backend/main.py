@@ -31,7 +31,7 @@ aqi_result_store = {
     "payout": None,
     "last_updated": None
 }
-AQI_THRESHOLD = 250
+AQI_THRESHOLD = 350
 logging.basicConfig(level=logging.INFO)
 # --- STARTUP EVENT ---
 @app.on_event("startup")
@@ -286,7 +286,7 @@ def fetch_aqi(city: str = "Asansol"):
 
 def delayed_aqi_process(city: str = "Asansol"):
     try:
-        time.sleep(15)
+        time.sleep(7200)
 
         aqi = fetch_aqi(city)
         breached = aqi > AQI_THRESHOLD
