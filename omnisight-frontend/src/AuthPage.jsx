@@ -100,7 +100,7 @@ const handleLogout = () => {
           navigate("/admin/dashboard");
         } else {
           // navigate("/client/dashboard");
-          navigate("/client/plan-dashboard");
+          navigate("/client/dashboard");
         }
       } else {
         alert("Account created successfully! Please login.");
