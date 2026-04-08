@@ -4,7 +4,7 @@ import API from "./api";
 export const getClientData = () => API.get("/client/dashboard");
 
 // Fetch only the last 4 payouts (keeps the dashboard clean)
-export const getDashboardActivity = () => API.get("/client/dashboard-activity");
+export const getDashboardActivity = () => API.get("/client/dashboard-stats");
 
 // Fetch every payout for the dedicated history page
 export const getPayoutHistory = () => API.get("/client/all-payouts");
