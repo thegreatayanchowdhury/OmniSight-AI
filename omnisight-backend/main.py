@@ -367,17 +367,19 @@ def withdraw_balance(
     if amount <= 0:
         raise HTTPException(status_code=400, detail="Amount must be greater than zero")
     
+     #  Re-fetch user in same session
+    user = db.query(models.User).filter(models.User.id == current_user.id).first()
     # Check if user has enough balance
     # current_user.balance is Numeric, so we convert to float for comparison
-    if float(current_user.balance) < amount:
+    if float(user.balance) < amount:
         raise HTTPException(status_code=400, detail="Insufficient funds in your account")
 
     # Update User Balance in MySQL
-    current_user.balance = float(current_user.balance) - amount
+    user.balance = float(user.balance) - amount
     
     # Log the withdrawal so it appears in recent activity
     withdrawal_entry = models.Payout(
-        user_id=current_user.id,
+        user_id=user.id,
         amount=-amount,  # Negative shows money leaving the system
         disruption_type="Withdrawal",
         severity_level="N/A",
@@ -388,9 +390,10 @@ def withdraw_balance(
     
     db.add(withdrawal_entry)
     db.commit()
+    db.refresh(user)
     
     return {
         "status": "success", 
         "message": f"Successfully withdrawn ₹{amount}", 
-        "new_balance": current_user.balance
+        "new_balance": user.balance
     }

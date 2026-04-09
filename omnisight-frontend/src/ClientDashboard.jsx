@@ -61,7 +61,18 @@ const ClientDashboard = () => {
   };
 
   useEffect(() => {
+    // Initial load
     fetchData();
+
+    //  Poll every 5 seconds
+    const interval = setInterval(() => {
+      if(document.visibilityState === "visible"){
+      fetchData();
+      }
+    }, 5000);
+
+    // Cleanup to prevent memory leaks
+    return () => clearInterval(interval);
   }, []);
 
   // const handleLogout = () => {
