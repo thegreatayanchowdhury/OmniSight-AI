@@ -41,7 +41,7 @@ const ClientDashboard = () => {
 
       setUser({
         name: userRes.data?.name || "User",
-        balance: `₹${userRes.data?.balance || 0}`,
+         balance: userRes.data?.balance || 0,
         zone: userRes.data?.city || "N/A"
       });
 
@@ -118,7 +118,7 @@ const ClientDashboard = () => {
           <div className="flex items-center gap-4">
               <div className="text-right hidden sm:block">
                 <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">Wallet Balance</p>
-                <p className="text-xl font-bold text-omni-emerald">{user.balance}</p>
+                <p className="text-xl font-bold text-omni-emerald">₹{user.balance}</p>
               </div>
               <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-omni-emerald to-emerald-800 flex items-center justify-center font-bold text-white">
                 {user.name.charAt(0)}
@@ -164,7 +164,7 @@ const ClientDashboard = () => {
                 <div className="p-2 bg-blue-500/20 text-blue-400 rounded-lg group-hover:scale-110 transition-transform"><TrendingUp size={20}/></div>
                 <p className="text-gray-400 text-sm">Income Recovered</p>
               </div>
-              <p className="text-2xl font-bold text-white">{user.balance}</p>
+              <p className="text-2xl font-bold text-white">₹{user.balance}</p>
             </div>
             <div onClick={()=>navigate("/client/payout-history")} className="cursor-pointer group bg-omni-dark-card border border-white/5 p-6 rounded-3xl hover:border-orange-500/30 transition-all">
               <div className="flex items-center gap-4 mb-2">
@@ -191,7 +191,7 @@ const ClientDashboard = () => {
               <div key={item.id} className="flex items-center justify-between py-4 border-b border-white/5 last:border-0">
                 <div className="flex items-center gap-4">
                   <div className={`p-3 rounded-xl ${item.amount.includes('+') ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-400'}`}>
-                    {item.amount.includes('+') ? <Wallet size={20} /> : <ArrowUpRight size={20} />}
+                    {item.amount > 0 ? <Wallet size={20} /> : <ArrowUpRight size={20} />}
                   </div>
                   <div>
                     <p className="font-bold text-white">{item.event}</p>
@@ -199,7 +199,7 @@ const ClientDashboard = () => {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className={`font-bold ${item.amount.includes('+') ? 'text-omni-emerald' : 'text-red-400'}`}>
+                  <p className={`font-bold ${item.amount > 0 ? 'text-omni-emerald' : 'text-red-400'}`}>
                     {item.amount}
                   </p>
                   <p className="text-[10px] uppercase tracking-widest text-gray-600 font-bold">{item.status}</p>
