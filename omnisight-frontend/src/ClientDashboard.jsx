@@ -49,7 +49,7 @@ const ClientDashboard = () => {
         id: p.id,
         type: "Protection",
         event: p.event,
-        amount: p.amount,
+        amount: Number(p.amount),
         date: p.date,
         status: "Completed"
       })) || [];
@@ -190,8 +190,8 @@ const ClientDashboard = () => {
             {activities.length > 0 ? activities.map((item) => (
               <div key={item.id} className="flex items-center justify-between py-4 border-b border-white/5 last:border-0">
                 <div className="flex items-center gap-4">
-                  <div className={`p-3 rounded-xl ${item.amount > 0 ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-400'}`}>
-                    {item.amount > 0 ? <Wallet size={20} /> : <ArrowUpRight size={20} />}
+                  <div className={`p-3 rounded-xl ${Number(item.amount) > 0? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-400'}`}>
+                    {Number(item.amount) > 0 ? <Wallet size={20} /> : <ArrowUpRight size={20} />}
                   </div>
                   <div>
                     <p className="font-bold text-white">{item.event}</p>
@@ -199,8 +199,12 @@ const ClientDashboard = () => {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className={`font-bold ${item.amount > 0 ? 'text-omni-emerald' : 'text-red-400'}`}>
-                    {item.amount > 0 ? `+₹${item.amount}` : `-₹${Math.abs(item.amount)}`}
+                  <p className={`font-bold ${Number(item.amount) > 0 ? 'text-omni-emerald' : 'text-red-400'}`}>
+                    {!isNaN(Number(item.amount))
+                      ? Number(item.amount) > 0
+                        ? `+₹${Number(item.amount)}`
+                        : `-₹${Math.abs(Number(item.amount))}`
+                      : "₹0"}
                   </p>
                   <p className="text-[10px] uppercase tracking-widest text-gray-600 font-bold">{item.status}</p>
                 </div>
