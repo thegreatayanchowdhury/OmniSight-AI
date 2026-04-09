@@ -23,7 +23,7 @@ const ClientDashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState({
     name: "Loading...",
-    balance: "₹0",
+    balance: "0",
     zone: "Loading..."
   });
 
@@ -190,7 +190,7 @@ const ClientDashboard = () => {
             {activities.length > 0 ? activities.map((item) => (
               <div key={item.id} className="flex items-center justify-between py-4 border-b border-white/5 last:border-0">
                 <div className="flex items-center gap-4">
-                  <div className={`p-3 rounded-xl ${item.amount.includes('+') ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-400'}`}>
+                  <div className={`p-3 rounded-xl ${item.amount > 0 ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-400'}`}>
                     {item.amount > 0 ? <Wallet size={20} /> : <ArrowUpRight size={20} />}
                   </div>
                   <div>
