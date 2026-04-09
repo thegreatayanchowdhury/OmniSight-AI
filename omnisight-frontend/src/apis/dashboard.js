@@ -11,3 +11,5 @@ export const getPayoutHistory = () => API.get("/client/all-payouts");
 
 // Admin Dashboard Data
 export const getAdminData = () => API.get("/admin/dashboard");
+
+export const withdrawBalance = (amount) => API.post(`/client/withdraw?amount=${amount}`);
