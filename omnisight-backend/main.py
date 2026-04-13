@@ -7,7 +7,6 @@ from zone_risk import get_live_zone_scores, get_heatmap_payload
 import logging
 logger = logging.getLogger(__name__)
 from database import SessionLocal, engine
-from zone_risk import get_live_zone_scores, get_heatmap_payload
 
 app = FastAPI(title="OmniSight AI API")
 

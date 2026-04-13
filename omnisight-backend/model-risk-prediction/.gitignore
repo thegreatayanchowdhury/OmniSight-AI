@@ -4,7 +4,7 @@ __pycache__/
 .venv/
 
 # Data and artifacts
-artifacts/models/
+# NOTE: artifacts/models/ is NOT ignored — the .joblib bundle is required at runtime
 artifacts/reports/
 *.log
 

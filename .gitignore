@@ -12,6 +12,12 @@ __pycache__/
 # Model Risk Prediction generated outputs
 omnisight-backend/model-risk-prediction/data/**
 !omnisight-backend/model-risk-prediction/data/**/.gitkeep
+!omnisight-backend/model-risk-prediction/data/zones.json
+!omnisight-backend/model-risk-prediction/data/processed/
+!omnisight-backend/model-risk-prediction/data/processed/zone_risk_scores_latest.csv
+!omnisight-backend/model-risk-prediction/data/processed/zone_risk_heatmap_latest.csv
 omnisight-backend/model-risk-prediction/artifacts/**
 !omnisight-backend/model-risk-prediction/artifacts/**/.gitkeep
+!omnisight-backend/model-risk-prediction/artifacts/models/
+!omnisight-backend/model-risk-prediction/artifacts/models/risk_xgboost_bundle.joblib
 omnisight-backend/model-risk-prediction/**/__pycache__/
