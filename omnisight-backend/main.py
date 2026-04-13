@@ -68,6 +68,17 @@ def evaluate_kill_switch(db: Session):
 
     print("Fraud count:", total_fraud)
     print("Payout count:", total_payouts)
+class SecurityCheckRequest(BaseModel):
+    risk_score: int
+    adb: bool = False
+    rooted: bool = False
+    emulator: bool = False
+    frida: bool = False
+    debugger: bool = False
+    developer_mode: bool = False
+    hooking: bool = False
+    location: dict | None = None
+
 
 AQI_THRESHOLD = 350
 logging.basicConfig(level=logging.INFO)
@@ -453,6 +464,86 @@ def delayed_aqi_process(city: str = "Asansol"):
     
     except Exception as e:
         logging.error(f"AQI Background Error: {e}")
+
+def calculate_device_risk(data: dict):
+    risk = data.get("risk_score", 0)
+
+    if data.get("adb"):
+        risk += 20
+
+    if data.get("developer_mode"):
+        risk += 10
+
+    if data.get("rooted"):
+        risk += 30
+
+    if data.get("emulator"):
+        risk += 25
+
+    if data.get("frida"):
+        risk += 40
+
+    if data.get("debugger"):
+        risk += 25
+
+    if data.get("hooking"):
+        risk += 40
+
+    return min(risk, 100)
+
+
+@app.post("/security/check")
+def security_check(
+    payload: SecurityCheckRequest,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    data = payload.dict()
+
+    # Calculate risk
+    final_risk = calculate_device_risk(data)
+
+    # Build context for your existing fraud engine
+    context = {
+        "sudden_location_jump": False,
+        "recent_activity": True,
+        "is_emulator": data.get("emulator"),
+        "is_rooted": data.get("rooted"),
+        "suspicious_cluster": data.get("frida") or data.get("hooking"),
+        "network_mismatch": False
+    }
+
+    # Evaluate using your AI fraud engine
+    fraud_result = evaluate_claim(current_user, db, context)
+
+    # Store fraud log
+    log = FraudLog(
+        user_id=current_user.id,
+        risk_score=final_risk,
+        risk_level=fraud_result["risk_level"],
+        reasons=",".join(fraud_result["reasons"]),
+        created_at=datetime.now()
+    )
+
+    db.add(log)
+    db.commit()
+
+    # Decision logic
+    if final_risk >= 70 or fraud_result["risk_level"] == "HIGH":
+        decision = "BLOCK"
+    elif final_risk >= 40:
+        decision = "REVIEW"
+    else:
+        decision = "ALLOW"
+
+    return {
+        "success": True,
+        "risk_score": final_risk,
+        "decision": decision,
+        "fraud_analysis": fraud_result
+    }
+
+
 
 @app.get("/aqi")
 def run_oracle(city: str = "Asansol"):
