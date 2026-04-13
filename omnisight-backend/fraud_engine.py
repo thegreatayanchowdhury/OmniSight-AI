@@ -33,16 +33,29 @@ def evaluate_claim(user, db, context):
         risk_score += 20
         reasons.append("Network vs location mismatch")
 
-    #  FINAL LEVEL
-    if risk_score < 30:
-        level = "LOW"
-    elif risk_score < 60:
-        level = "MEDIUM"
+    # --- TRUST SCORE UPDATE ---
+    if risk_score > 70:
+        user.trust_score -= 10
+        user.fraud_flags += 1
+
+    elif risk_score > 40:
+        user.trust_score -= 5
+
     else:
-        level = "HIGH"
+        user.trust_score += 1  # reward good behavior
+
+    if risk_score >= 70:
+        risk_level = "HIGH"
+    elif risk_score >= 40:
+        risk_level = "MEDIUM"
+    else:
+        risk_level = "LOW"
+    # clamp between 0–100
+    user.trust_score = max(0, min(100, user.trust_score))
+
+    db.commit()
 
     return {
-        "risk_score": risk_score,
-        "risk_level": level,
-        "reasons": reasons
-    }
+    "risk_level": risk_level,
+    "score": risk_score
+}

@@ -8,7 +8,7 @@ import  models,schemas, auth
 from database import SessionLocal , get_db
 from pricing import calculate_weekly_premium
 from datetime import datetime, date
-from automation import start_oracle
+
 import threading
 from models import Base
 from database import engine
@@ -38,14 +38,17 @@ aqi_result_store = {
     "payout": None,
     "last_updated": None
 }
+
+kill_switch_status = {
+    "active": False,
+    "reason": None
+}
+
 AQI_THRESHOLD = 350
 logging.basicConfig(level=logging.INFO)
 # --- STARTUP EVENT ---
-@app.on_event("startup")
-def start_background_tasks():
-    thread = threading.Thread(target=start_oracle)
-    thread.daemon = True
-    thread.start()
+
+
 
 @app.on_event("startup")
    
@@ -324,6 +327,27 @@ def delayed_aqi_process(city: str = "Asansol"):
 
             for user in users:
 
+    # simulate fraud only for some users
+                is_fraud = random.choice([True, False])
+
+                if is_fraud:
+                    context = {
+                        "sudden_location_jump": True,
+                        "recent_activity": False,
+                        "is_emulator": True,
+                        "is_rooted": True,
+                        "suspicious_cluster": True,
+                        "network_mismatch": True
+                    }
+                else:
+                    context = {
+                        "sudden_location_jump": False,
+                        "recent_activity": True,
+                        "is_emulator": False,
+                        "is_rooted": False,
+                        "suspicious_cluster": False,
+                        "network_mismatch": False
+                    }
               
 
                 log = FraudLog(
@@ -337,20 +361,26 @@ def delayed_aqi_process(city: str = "Asansol"):
                 db.add(log)
                 db.commit()
 
-                context = {
-                    "sudden_location_jump": False,
-                    "recent_activity": True,
-                    "is_emulator": False,
-                    "is_rooted": False,
-                    "suspicious_cluster": False,
-                    "network_mismatch": False
-                }
+                # context = {
+                #     "sudden_location_jump": False,
+                #     "recent_activity": True,
+                #     "is_emulator": False,
+                #     "is_rooted": False,
+                #     "suspicious_cluster": False,
+                #     "network_mismatch": False
+                # }
 
                 fraud_result = evaluate_claim(user, db, context)
 
                 logging.info(f"User {user.id} Risk: {fraud_result}")
 
                 #  HIGH RISK → BLOCK
+                #  TRUST SCORE BLOCK
+                if user.trust_score < 40:
+                    logging.warning(f"🚨 Low trust user {user.id} blocked")
+                    continue
+
+                # 🚨 FRAUD ENGINE BLOCK
                 if fraud_result["risk_level"] == "HIGH":
                     logging.warning(f"🚨 Fraud detected for user {user.id}")
                     continue

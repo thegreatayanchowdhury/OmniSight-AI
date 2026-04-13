@@ -17,6 +17,8 @@ class User(Base):
     city = Column(String(100), default="Asansol")
     avg_daily_income = Column(Float, default=500.0)
     activity_tier = Column(String(20), default="silver")
+    trust_score = Column(Float, default=80.0)
+    fraud_flags = Column(Integer, default=0)
 
 class Payout(Base):
     __tablename__ = "payouts"
