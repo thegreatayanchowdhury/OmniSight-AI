@@ -35,9 +35,9 @@ class Payout(Base):
 class FraudLog(Base):
     __tablename__ = "fraud_logs"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer)
     risk_score = Column(Integer)
     risk_level = Column(String)
-    reasons = Column(String)
-    created_at = Column(DateTime)
+    reason = Column(String)
+    timestamp = Column(DateTime)

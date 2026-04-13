@@ -44,6 +44,31 @@ kill_switch_status = {
     "reason": None
 }
 
+def evaluate_kill_switch(db: Session):
+    total_fraud = db.query(FraudLog).count()
+
+    # total payouts today
+    today = datetime.now().date()
+    total_payouts = db.query(Payout)\
+        .filter(Payout.timestamp >= today)\
+        .count()
+
+    # 🔥 CONDITIONS
+    if total_fraud > 0:
+        kill_switch_status["active"] = True
+        kill_switch_status["reason"] = "High fraud activity detected"
+
+    elif total_payouts > 20:
+        kill_switch_status["active"] = True
+        kill_switch_status["reason"] = "Payout spike detected"
+
+    else:
+        kill_switch_status["active"] = False
+        kill_switch_status["reason"] = None
+
+    print("Fraud count:", total_fraud)
+    print("Payout count:", total_payouts)
+
 AQI_THRESHOLD = 350
 logging.basicConfig(level=logging.INFO)
 # --- STARTUP EVENT ---
@@ -324,6 +349,11 @@ def delayed_aqi_process(city: str = "Asansol"):
             value = aqi
 
             successful_payouts = 0
+            evaluate_kill_switch(db)
+
+            if kill_switch_status["active"]:
+                logging.warning(f"🚨 KILL SWITCH ACTIVE: {kill_switch_status['reason']}")
+                return
 
             for user in users:
 
@@ -348,6 +378,16 @@ def delayed_aqi_process(city: str = "Asansol"):
                         "suspicious_cluster": False,
                         "network_mismatch": False
                     }
+
+                # Fake fraud Trigger For Fraud logs
+                # context = {
+                #     "sudden_location_jump": True,
+                #     "recent_activity": False,
+                #     "is_emulator": True,
+                #     "is_rooted": True,
+                #     "suspicious_cluster": True,
+                #     "network_mismatch": True
+                # }
               
 
                 log = FraudLog(
@@ -580,3 +620,8 @@ def fraud_stats(
         "total_flags": total,
         "high_risk": high
     }
+
+#  KILL switch API
+@app.get("/admin/kill-switch-status")
+def get_kill_switch():
+    return kill_switch_status

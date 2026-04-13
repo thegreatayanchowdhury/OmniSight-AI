@@ -681,7 +681,29 @@ const [fraudStats, setFraudStats] = useState({
   high_risk: 0
 });
 
+const [killSwitch, setKillSwitch] = useState({
+  active: false,
+  reason: null
+});
+
 useEffect(() => {
+  const fetchKillSwitch = async () => {
+    try {
+      const killRes = await axios.get(
+        "/admin/kill-switch-status"
+      );
+      setKillSwitch(killRes.data);
+    } catch (err) {
+      console.error("Kill switch fetch error:", err);
+    }
+  };
+
+  fetchKillSwitch();
+}, []);
+
+useEffect(() => {
+
+
   const fetchFraudData = async () => {
     try {
       const logsRes = await axios.get("/admin/fraud-logs");
@@ -750,12 +772,30 @@ useEffect(() => {
             Instantly halt all new policy enrollments and renewals during
             high-risk scenarios.
           </p>
-          <button className="mt-5 w-full bg-red-600 hover:bg-red-500 py-3 rounded-xl font-bold text-lg">
+
+          <button
+            className={`mt-5 w-full py-3 rounded-xl font-bold text-lg ${
+              killSwitch.active
+                ? "bg-red-700 animate-pulse"
+                : "bg-green-600"
+            }`}
+          >
             🚨 KILL SWITCH
           </button>
-          <p className="text-green-400 text-xs mt-2">
-            Status: System Active
+
+          <p
+            className={`text-xs mt-2 ${
+              killSwitch.active ? "text-red-400" : "text-green-400"
+            }`}
+          >
+            Status: {killSwitch.active ? "ACTIVE 🚨" : "System Safe"}
           </p>
+
+          {killSwitch.reason && (
+            <p className="text-orange-400 text-xs mt-1">
+              Reason: {killSwitch.reason}
+            </p>
+          )}
         </div>
 
         <div className="bg-white/5 border border-white/10 rounded-3xl p-6">

@@ -1,4 +1,5 @@
-
+from models import FraudLog
+from datetime import datetime
 
 def evaluate_claim(user, db, context):
     risk_score = 0
@@ -50,6 +51,19 @@ def evaluate_claim(user, db, context):
         risk_level = "MEDIUM"
     else:
         risk_level = "LOW"
+
+    
+    # 🔥 SAVE FRAUD LOG
+    fraud_log = FraudLog(
+        user_id=user.id,
+        risk_score=risk_score,
+        risk_level=risk_level,
+        reason=", ".join(reasons),
+        timestamp=datetime.now()
+    )
+
+    db.add(fraud_log)
+
     # clamp between 0–100
     user.trust_score = max(0, min(100, user.trust_score))
 
