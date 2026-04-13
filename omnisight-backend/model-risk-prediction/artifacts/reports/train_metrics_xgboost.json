@@ -1,0 +1,38 @@
+{
+  "model": "xgboost",
+  "metrics": {
+    "rmse": 3.0014633079025375,
+    "mae": 1.500641896889345,
+    "r2": 0.8911008321767433
+  },
+  "feature_count": 16,
+  "trained_rows": 448,
+  "validated_rows": 112,
+  "feature_columns": [
+    "flood_event_count_24m",
+    "avg_event_rainfall_mm",
+    "max_event_rainfall_mm",
+    "curfew_count_qtr",
+    "avg_curfew_hours",
+    "power_outage_count_month",
+    "avg_power_outage_hours",
+    "traffic_disruption_hours_week",
+    "disruption_days_month",
+    "proximity_river_km",
+    "coastal_exposure_index",
+    "elevation_m",
+    "adjacent_zone_risk_prev_week",
+    "month_sin",
+    "month_cos",
+    "geo_risk_index"
+  ],
+  "config": {
+    "features_path": "F:\\OMNISIGHT AI\\Model Risk Prediction\\data\\features\\weekly_zone_features.csv",
+    "model_out_path": "F:\\OMNISIGHT AI\\Model Risk Prediction\\artifacts\\models\\risk_xgboost_bundle.joblib",
+    "metrics_out_path": "F:\\OMNISIGHT AI\\Model Risk Prediction\\artifacts\\reports\\train_metrics_xgboost.json",
+    "test_fraction": 0.2,
+    "random_state": 42
+  },
+  "artifact": "F:\\OMNISIGHT AI\\Model Risk Prediction\\artifacts\\models\\risk_xgboost_bundle.joblib",
+  "created_utc": "2026-04-13T06:57:44.767978+00:00"
+}

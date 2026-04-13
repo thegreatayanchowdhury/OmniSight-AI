@@ -13,6 +13,7 @@ from sqlalchemy import and_
 import threading
 from models import Base
 from database import engine
+from zone_risk import get_live_zone_scores, get_heatmap_payload
 import os
 import requests
 import random
@@ -821,3 +822,38 @@ def get_my_plan(db: Session = Depends(get_db), user: models.User = Depends(get_c
         "amount": sub.amount,
         "city": sub.city
     }
+
+# ---------------------------------------------------------------------------
+# ZONE RISK — LIVE SCORING  (every 15 min, cached in-process)
+# ---------------------------------------------------------------------------
+
+@app.get("/zones/risk/live")
+def live_zone_risk():
+    """
+    Returns live 0-100 risk scores for all 5 Mumbai/Thane zones.
+    Blend: XGBoost baseline 55% + live WeatherAPI 45%
+    Cached for 15 minutes in-process.
+    """
+    try:
+        zones = get_live_zone_scores()
+        return {
+            "zones":               zones,
+            "zone_count":          len(zones),
+            "update_interval_min": 15,
+            "scored_at":           zones[0]["scored_at"] if zones else None,
+        }
+    except Exception as exc:
+        logging.error("live_zone_risk failed: %s", exc)
+        raise HTTPException(status_code=500, detail="Zone risk scoring failed")
+
+
+@app.get("/zones/risk/heatmap")
+def live_heatmap_data():
+    """
+    Slim heatmap payload consumed by the frontend ZoneRiskMap component.
+    """
+    try:
+        return get_heatmap_payload()
+    except Exception as exc:
+        logging.error("live_heatmap_data failed: %s", exc)
+        raise HTTPException(status_code=500, detail="Heatmap data generation failed")

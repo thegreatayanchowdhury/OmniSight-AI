@@ -1,0 +1,23 @@
+{
+  "model": "lightgbm",
+  "metrics": {
+    "rmse": 2.370595696619602,
+    "mae": 1.3242681805347105,
+    "r2": 0.9320681460530416
+  },
+  "xgboost_baseline_rmse": 3.0014633079025375,
+  "rmse_gap_ratio": -0.21018668115046668,
+  "status": "pass",
+  "tolerance_ratio": 0.1,
+  "feature_count": 16,
+  "validated_rows": 112,
+  "config": {
+    "features_path": "F:\\OMNISIGHT AI\\Model Risk Prediction\\data\\features\\weekly_zone_features.csv",
+    "xgboost_metrics_path": "F:\\OMNISIGHT AI\\Model Risk Prediction\\artifacts\\reports\\train_metrics_xgboost.json",
+    "report_out_path": "F:\\OMNISIGHT AI\\Model Risk Prediction\\artifacts\\reports\\validation_lightgbm_vs_xgboost.json",
+    "test_fraction": 0.2,
+    "random_state": 42,
+    "rmse_tolerance_ratio": 0.1
+  },
+  "created_utc": "2026-04-13T06:57:46.335361+00:00"
+}
