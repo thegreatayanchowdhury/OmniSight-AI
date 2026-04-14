@@ -69,7 +69,7 @@ def evaluate_kill_switch(db: Session):
     print("Fraud count:", total_fraud)
     print("Payout count:", total_payouts)
 
-AQI_THRESHOLD = 350
+AQI_THRESHOLD = 230
 logging.basicConfig(level=logging.INFO)
 # --- STARTUP EVENT ---
 
