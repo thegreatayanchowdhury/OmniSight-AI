@@ -150,7 +150,8 @@ def signup(user: schemas.UserSignup, db: Session = Depends(get_db)):
         balance=0,                 
         city="Asansol",            
         avg_daily_income=500.0,      
-        activity_tier="silver" 
+        activity_tier="silver",
+        is_onboarded=0
     )
 
     db.add(new_user)
@@ -182,7 +183,8 @@ def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
     "role": db_user.role if db_user.role else "client",
     "city": db_user.city,
     "avg_daily_income": db_user.avg_daily_income,
-    "activity_tier": db_user.activity_tier
+    "activity_tier": db_user.activity_tier,
+    "is_onboarded": user.is_onboarded
     }
 
 
@@ -635,3 +637,20 @@ def toggle_kill_switch(
         "status": "updated",
         "kill_switch": kill_switch_status
     }
+
+@app.post("/complete-onboarding")
+def complete_onboarding(user_id: int, plan: str, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+
+    if not user:
+        return {"error": "User not found"}
+
+    # Save selected plan
+    user.activity_tier = plan
+
+    # Mark onboarding complete
+    user.is_onboarded = 1
+
+    db.commit()
+
+    return {"message": "Onboarding completed"}

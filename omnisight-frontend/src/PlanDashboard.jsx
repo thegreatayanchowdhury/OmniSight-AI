@@ -38,9 +38,37 @@ const PlanDashboard = () => {
 
     fetchPremium();
   }, []);
-  const handleBuy = (plan) => {
-    navigate("/buy", { state: { plan } });
-  };
+  const handleBuy = async (plan) => {
+  try {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+
+    await fetch(`${API_BASE_URL}/complete-onboarding`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        user_id: storedUser.id,
+        plan: plan.title.toLowerCase(), // basic / premium / elite
+      }),
+    });
+
+    //  Update localStorage instantly
+    const updatedUser = {
+      ...storedUser,
+      activity_tier: plan.title.toLowerCase(),
+      is_onboarded: 1,
+    };
+
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+
+    //  Redirect to dashboard
+    navigate("/client/dashboard");
+
+  } catch (err) {
+    console.error("Plan selection error:", err);
+  }
+};
 
   if (!user) return null;
 

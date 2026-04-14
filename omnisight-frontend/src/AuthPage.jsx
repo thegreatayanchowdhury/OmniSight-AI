@@ -21,12 +21,11 @@ const AuthPage = () => {
 
   const handleContinue = () => {
     const role = localStorage.getItem("role");
-    const user = JSON.parse(localStorage.getItem("user"));
 
     if (role === "admin") {
       navigate("/admin/dashboard");
     } else {
-      if (!user?.activity_tier) {
+      if (data.is_onboarded === 0) {
         navigate("/client/plan-dashboard");
       } else {
         navigate("/client/dashboard");
@@ -79,13 +78,14 @@ const AuthPage = () => {
           role: data.role,
           city: data.city,
           avg_daily_income: data.avg_daily_income,
-          activity_tier: data.activity_tier
+          activity_tier: data.activity_tier,
+          is_onboarded: data.is_onboarded 
         }));
 
         if (data.role === "admin") {
           navigate("/admin/dashboard");
         } else {
-          if (!data.activity_tier) {
+          if (data.is_onboarded === 0) {
             navigate("/client/plan-dashboard"); // new user
           } else {
             navigate("/client/dashboard"); // existing user
