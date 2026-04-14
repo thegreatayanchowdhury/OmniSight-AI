@@ -195,7 +195,7 @@ def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
     "city": db_user.city,
     "avg_daily_income": db_user.avg_daily_income,
     "activity_tier": db_user.activity_tier,
-    "is_onboarded": user.is_onboarded
+    "is_onboarded": db_user.is_onboarded
     }
 
 
