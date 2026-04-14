@@ -343,7 +343,7 @@ def fetch_aqi(city: str = "Asansol"):
 
 def delayed_aqi_process(city: str = "Asansol"):
     try:
-        time.sleep(7200)
+        time.sleep(120)   # ✅ change here
 
         aqi = fetch_aqi(city)
         breached = aqi > AQI_THRESHOLD
@@ -358,18 +358,22 @@ def delayed_aqi_process(city: str = "Asansol"):
 
             event_type = "AQI"
             value = aqi
-
             successful_payouts = 0
+
+            # ✅ STEP 1: CHECK KILL SWITCH
             evaluate_kill_switch(db)
 
             if kill_switch_status["active"]:
                 logging.warning(f"🚨 KILL SWITCH ACTIVE: {kill_switch_status['reason']}")
+                db.close()
                 return
 
+            # ✅ STEP 2: PROCESS USERS
             for user in users:
 
-    # simulate fraud only for some users
                 is_fraud = random.choice([True, False])
+                # 🔥 TEST MODE (remove later)
+                # is_fraud = True
 
                 if is_fraud:
                     context = {
@@ -390,68 +394,43 @@ def delayed_aqi_process(city: str = "Asansol"):
                         "network_mismatch": False
                     }
 
-                # Fake fraud Trigger For Fraud logs
-                # context = {
-                #     "sudden_location_jump": True,
-                #     "recent_activity": False,
-                #     "is_emulator": True,
-                #     "is_rooted": True,
-                #     "suspicious_cluster": True,
-                #     "network_mismatch": True
-                # }
-              
-
-                log = FraudLog(
-                    user_id=user.id,
-                    risk_score=fraud_result["risk_score"],
-                    risk_level=fraud_result["risk_level"],
-                    reasons=",".join(fraud_result["reasons"]),
-                    created_at=datetime.now()
-                )
-
-                db.add(log)
-                db.commit()
-
-                # context = {
-                #     "sudden_location_jump": False,
-                #     "recent_activity": True,
-                #     "is_emulator": False,
-                #     "is_rooted": False,
-                #     "suspicious_cluster": False,
-                #     "network_mismatch": False
-                # }
-
                 fraud_result = evaluate_claim(user, db, context)
 
                 logging.info(f"User {user.id} Risk: {fraud_result}")
 
-                #  HIGH RISK → BLOCK
-                #  TRUST SCORE BLOCK
+                # 🚨 TRUST BLOCK
                 if user.trust_score < 40:
-                    logging.warning(f"🚨 Low trust user {user.id} blocked")
                     continue
 
-                # 🚨 FRAUD ENGINE BLOCK
+                # 🚨 FRAUD BLOCK
                 if fraud_result["risk_level"] == "HIGH":
-                    logging.warning(f"🚨 Fraud detected for user {user.id}")
                     continue
 
-                #  MEDIUM RISK → SKIP
+                # ⚠️ MEDIUM SKIP
                 if fraud_result["risk_level"] == "MEDIUM":
-                    logging.warning(f"⚠️ Medium risk user {user.id}")
                     continue
 
-                #  LOW RISK → PAYOUT
+                # ✅ PAYOUT
                 process_payout(event_type, value, user, db)
                 successful_payouts += 1
 
             db.close()
 
-        payout_info = {
-            "type": event_type,
-            "value": value,
-            "status": f"{successful_payouts} users paid"
-        }
+            # ✅ CREATE AFTER LOOP
+            payout_info = {
+                "type": event_type,
+                "value": value,
+                "status": f"{successful_payouts} users paid"
+            }
+
+        else:
+            payout_info = {
+                "type": "AQI",
+                "value": aqi,
+                "status": "No breach"
+            }
+
+        
 
         # ✅ store result
         aqi_result_store.update({
@@ -710,22 +689,40 @@ def get_fraud_logs(
 
 
 @app.get("/admin/fraud-stats")
-def fraud_stats(
-    db: Session = Depends(get_db),
-    current_user=Depends(auth.require_role("admin"))
-):
-    total = db.query(models.FraudLog).count()
-
-    high = db.query(models.FraudLog)\
-        .filter(models.FraudLog.risk_level == "HIGH")\
-        .count()
+def fraud_stats(db: Session = Depends(get_db)):
+    total = db.query(FraudLog).count()
+    high = db.query(FraudLog).filter(FraudLog.risk_level == "HIGH").count()
+    medium = db.query(FraudLog).filter(FraudLog.risk_level == "MEDIUM").count()
 
     return {
         "total_flags": total,
-        "high_risk": high
+        "high_risk": high,
+        "medium_risk": medium,
+        "fraud_ratio": round(high / total, 2) if total > 0 else 0
     }
 
 #  KILL switch API
 @app.get("/admin/kill-switch-status")
 def get_kill_switch():
     return kill_switch_status
+
+# GLOBAL STATE
+kill_switch_status = {
+    "active": False,
+    "reason": None
+}
+
+
+@app.post("/admin/kill-switch")
+def toggle_kill_switch(
+    active: bool,
+    reason: str = None,
+    current_user=Depends(auth.require_role("admin"))
+):
+    kill_switch_status["active"] = active
+    kill_switch_status["reason"] = reason if active else None
+
+    return {
+        "status": "updated",
+        "kill_switch": kill_switch_status
+    }

@@ -54,12 +54,12 @@ def evaluate_claim(user, db, context):
 
     
     # 🔥 SAVE FRAUD LOG
-    fraud_log = FraudLog(
+        fraud_log = FraudLog(
         user_id=user.id,
         risk_score=risk_score,
         risk_level=risk_level,
-        reason=", ".join(reasons),
-        timestamp=datetime.now()
+        reasons=", ".join(reasons),   # ✅ change key name
+        created_at=datetime.now()     # ✅ match your API
     )
 
     db.add(fraud_log)

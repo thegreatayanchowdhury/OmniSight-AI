@@ -689,9 +689,7 @@ const [killSwitch, setKillSwitch] = useState({
 useEffect(() => {
   const fetchKillSwitch = async () => {
     try {
-      const killRes = await axios.get(
-        "/admin/kill-switch-status"
-      );
+      const killRes = await axios.get("/admin/kill-switch-status");
       setKillSwitch(killRes.data);
     } catch (err) {
       console.error("Kill switch fetch error:", err);
@@ -699,11 +697,13 @@ useEffect(() => {
   };
 
   fetchKillSwitch();
+
+  const interval = setInterval(fetchKillSwitch, 5000); // 🔥 live
+
+  return () => clearInterval(interval);
 }, []);
 
 useEffect(() => {
-
-
   const fetchFraudData = async () => {
     try {
       const logsRes = await axios.get("/admin/fraud-logs");
@@ -721,6 +721,10 @@ useEffect(() => {
   };
 
   fetchFraudData();
+
+  const interval = setInterval(fetchFraudData, 5000); // 🔥 every 5 sec
+
+  return () => clearInterval(interval); // cleanup
 }, []);
 
   return (
@@ -819,8 +823,8 @@ useEffect(() => {
         {[
           { label: "TOTAL PARTNERS", value: "12,402", icon: <Users /> },
           { label: "ACTIVE TRIGGERS", value: "3", icon: <Zap /> },
-          { label: "FRAUD FLAGGED", value: fraudStats.high_risk, icon: <AlertOctagon /> },,
-          { label: "PAYOUTS TODAY", value: "₹42,500", icon: <Activity /> }
+          { label: "FRAUD FLAGGED", value: fraudStats.total_flags, icon: <AlertOctagon /> },
+          { label: "HIGH RISK", value: fraudStats.high_risk, icon: <AlertOctagon /> }
         ].map((card, index) => (
           <div
             key={index}

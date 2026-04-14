@@ -36,8 +36,8 @@ class FraudLog(Base):
     __tablename__ = "fraud_logs"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer)
+    user_id = Column(Integer, ForeignKey("users.id"))
     risk_score = Column(Integer)
-    risk_level = Column(String)
-    reason = Column(String)
-    timestamp = Column(DateTime)
+    risk_level = Column(String(100))
+    reasons = Column(String(100))
+    timestamp = Column(DateTime, default=datetime.utcnow)
