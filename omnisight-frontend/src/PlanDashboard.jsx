@@ -58,8 +58,7 @@ const PlanDashboard = () => {
 
     localStorage.setItem("user", JSON.stringify(updatedUser));
 
-    //  Redirect to dashboard
-    navigate("/client/dashboard");
+   navigate("/buy", { state: { plan } });
 
   } catch (err) {
     console.error("Plan selection error:", err);

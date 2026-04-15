@@ -60,7 +60,7 @@ const AuthPage = () => {
       const data = response.data;
 
       if (isLogin) {
-        // साफ storage
+        // storage
         localStorage.clear();
 
         if (!data.access_token) {

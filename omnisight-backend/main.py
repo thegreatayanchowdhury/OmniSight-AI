@@ -8,6 +8,7 @@ import  models,schemas, auth
 from database import SessionLocal , get_db
 from pricing import calculate_weekly_premium
 from datetime import datetime, date
+from sqlalchemy import and_
 
 import threading
 from models import Base
@@ -28,7 +29,8 @@ from fastapi import HTTPException
 from sqlalchemy import desc
 
 from fraud_engine import evaluate_claim
-from models import FraudLog
+from models import FraudLog,Subscription
+import razorpay
 
 
 app = FastAPI(title="OmniSight AI API")
@@ -745,3 +747,77 @@ def complete_onboarding(user_id: int, plan: str, db: Session = Depends(get_db)):
     db.commit()
 
     return {"message": "Onboarding completed"}
+
+# Razorpay clientdict
+client = razorpay.Client(
+    auth=(os.getenv("RAZORPAY_KEY_ID"), os.getenv("RAZORPAY_KEY_SECRET"))
+)
+
+class OrderRequest(BaseModel):
+    amount: int
+
+@app.post("/create-order")
+def create_order(data: dict, db: Session = Depends(get_db), user: models.User = Depends(get_current_user)):
+    
+    amount = data["amount"]
+
+    order = client.order.create({
+        "amount": amount * 100,
+        "currency": "INR",
+        "payment_capture": 1
+    })
+
+    # DB me save karo
+    subscription = Subscription(
+        user_id=user.id,
+        plan=data.get("plan"),  # basic/premium
+        amount=amount,
+        city=data.get("city"),
+        razorpay_order_id=order["id"],
+        status="pending"
+    )
+
+    db.add(subscription)
+    db.commit()
+
+    return order
+@app.post("/verify-payment")
+def verify_payment(data: dict, db: Session = Depends(get_db)):
+
+    order_id = data["razorpay_order_id"]
+    payment_id = data["razorpay_payment_id"]
+
+    subscription = db.query(Subscription).filter(
+        Subscription.razorpay_order_id == order_id
+    ).first()
+
+    if not subscription:
+        raise HTTPException(status_code=404, detail="Order not found")
+
+    # update DB
+    subscription.status = "success"
+    subscription.razorpay_payment_id = payment_id
+
+    db.commit()
+
+    return {"message": "Payment verified"}
+
+@app.get("/get-my-plan")
+def get_my_plan(db: Session = Depends(get_db), user: models.User = Depends(get_current_user)):
+    
+    sub = db.query(Subscription).filter(
+        and_(
+            Subscription.user_id == user.id,
+            Subscription.status == "success"
+        )
+    ).order_by(Subscription.id.desc()).first()
+
+    if not sub:
+        return {"plan": None}
+
+    return {
+        "plan": sub.plan,
+        "status": sub.status,
+        "amount": sub.amount,
+        "city": sub.city
+    }

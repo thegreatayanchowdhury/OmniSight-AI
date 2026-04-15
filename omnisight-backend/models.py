@@ -42,3 +42,15 @@ class FraudLog(Base):
     risk_level = Column(String(100))
     reasons = Column(String(100))
     timestamp = Column(DateTime, default=datetime.utcnow)
+
+class Subscription(Base):
+    __tablename__ = "subscriptions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    plan = Column(String)  # basic / premium / elite
+    amount = Column(Integer)
+    city = Column(String)
+    status = Column(String, default="pending")  # pending / success
+    razorpay_order_id = Column(String)
+    razorpay_payment_id = Column(String)

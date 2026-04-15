@@ -36,7 +36,7 @@ const ClientDashboard = () => {
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-
+  const [premiumPlan, setPremiumPlan] = useState(null);
   const [open, setOpen] = useState(false);
   const [activities, setActivities] = useState([]);
 
@@ -91,10 +91,28 @@ const ClientDashboard = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // const handleLogout = () => {
-  //   localStorage.clear();
-  //   navigate("/");
-  // };
+  useEffect(() => {
+    fetch(`${import.meta.env.VITE_API_URL}/get-my-plan`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      }
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (!data.plan) {
+          setPremiumPlan(null);
+          return;
+        }
+
+        setPremiumPlan({
+          title: data.plan,          // 👈 FIX
+          weekly: `₹${data.amount}`, // 👈 FIX
+          status: data.status,
+          city: data.city
+        });
+      })
+      .catch(err => console.error("Plan fetch error", err));
+  }, []);
 
 
   const fixLeafletIcons = () => {
@@ -139,7 +157,7 @@ const ClientDashboard = () => {
               attribution: 'Traffic © TomTom',
               maxZoom: 19,
               opacity: 0.7,
-              pane: "trafficPane" 
+              pane: "trafficPane"
             }
           ).addTo(map);
 
@@ -299,104 +317,104 @@ const ClientDashboard = () => {
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-omni-dark text-gray-100 font-sans">
-        {/* --- MOBILE HEADER --- */}
-    <div className="lg:hidden flex items-center justify-between px-4 py-4 border-b border-white/10 bg-omni-dark-card/40 backdrop-blur-md">
+      {/* --- MOBILE HEADER --- */}
+      <div className="lg:hidden flex items-center justify-between px-4 py-4 border-b border-white/10 bg-omni-dark-card/40 backdrop-blur-md">
 
-      {/* LEFT: Logo */}
-      <div className="flex items-center gap-2">
-        <div className="p-1.5 bg-omni-emerald rounded-lg">
-          <Shield className="w-4 h-4 text-black" />
-        </div>
-        <span className="text-sm font-bold">
-          OmniSight <span className="text-omni-emerald">AI</span>
-        </span>
-      </div>
-
-      {/* RIGHT: Actions */}
-      <div className="flex items-center gap-3">
-
-        {/* MENU DROPDOWN */}
-        <div className="relative">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setMenuOpen(!menuOpen);
-              setProfileOpen(false);
-            }}
-            className="p-2 bg-white/5 rounded-lg"
-          >
-            <Menu size={18} />
-          </button>
-
-          {menuOpen && (
-            <div className="absolute right-0 mt-2 w-44 bg-black/80 backdrop-blur-xl border border-white/10 rounded-xl shadow-lg p-2 z-50">
-
-              <button
-                onClick={() => navigate("/client/dashboard")}
-                className="flex items-center gap-2 w-full px-3 py-2 hover:bg-white/10 rounded-lg"
-              >
-                <LayoutDashboard size={16} /> Dashboard
-              </button>
-
-              <button
-                onClick={() => navigate("/client/payout-history")}
-                className="flex items-center gap-2 w-full px-3 py-2 hover:bg-white/10 rounded-lg"
-              >
-                <History size={16} /> Payouts
-              </button>
-
-              <button
-                onClick={() => navigate("/client/heatmap")}
-                className="flex items-center gap-2 w-full px-3 py-2 hover:bg-white/10 rounded-lg"
-              >
-                <MapPin size={16} /> Heatmap
-              </button>
-
-            </div>
-          )}
+        {/* LEFT: Logo */}
+        <div className="flex items-center gap-2">
+          <div className="p-1.5 bg-omni-emerald rounded-lg">
+            <Shield className="w-4 h-4 text-black" />
+          </div>
+          <span className="text-sm font-bold">
+            OmniSight <span className="text-omni-emerald">AI</span>
+          </span>
         </div>
 
-        {/* PROFILE DROPDOWN */}
-        <div className="relative">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setProfileOpen(!profileOpen);
-              setMenuOpen(false);
-            }}
-            className="w-9 h-9 rounded-full bg-omni-emerald flex items-center justify-center text-black font-bold"
-          >
-            {user.name?.charAt(0)}
-          </button>
+        {/* RIGHT: Actions */}
+        <div className="flex items-center gap-3">
 
-          {profileOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-black/80 backdrop-blur-xl border border-white/10 rounded-xl shadow-lg p-3 z-50">
+          {/* MENU DROPDOWN */}
+          <div className="relative">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setMenuOpen(!menuOpen);
+                setProfileOpen(false);
+              }}
+              className="p-2 bg-white/5 rounded-lg"
+            >
+              <Menu size={18} />
+            </button>
 
-              <div className="text-sm text-gray-300 mb-2">
-                Balance
+            {menuOpen && (
+              <div className="absolute right-0 mt-2 w-44 bg-black/80 backdrop-blur-xl border border-white/10 rounded-xl shadow-lg p-2 z-50">
+
+                <button
+                  onClick={() => navigate("/client/dashboard")}
+                  className="flex items-center gap-2 w-full px-3 py-2 hover:bg-white/10 rounded-lg"
+                >
+                  <LayoutDashboard size={16} /> Dashboard
+                </button>
+
+                <button
+                  onClick={() => navigate("/client/payout-history")}
+                  className="flex items-center gap-2 w-full px-3 py-2 hover:bg-white/10 rounded-lg"
+                >
+                  <History size={16} /> Payouts
+                </button>
+
+                <button
+                  onClick={() => navigate("/client/heatmap")}
+                  className="flex items-center gap-2 w-full px-3 py-2 hover:bg-white/10 rounded-lg"
+                >
+                  <MapPin size={16} /> Heatmap
+                </button>
+
               </div>
+            )}
+          </div>
 
-              <div className="text-lg font-bold text-omni-emerald mb-3">
-                {user.balance}
-              </div>
+          {/* PROFILE DROPDOWN */}
+          <div className="relative">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setProfileOpen(!profileOpen);
+                setMenuOpen(false);
+              }}
+              className="w-9 h-9 rounded-full bg-omni-emerald flex items-center justify-center text-black font-bold"
+            >
+              {user.name?.charAt(0)}
+            </button>
 
-              <button
-                onClick={handleLogout}
-                className="hidden lg:flex items-center gap-2 px-6 py-2 rounded-full font-bold 
+            {profileOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-black/80 backdrop-blur-xl border border-white/10 rounded-xl shadow-lg p-3 z-50">
+
+                <div className="text-sm text-gray-300 mb-2">
+                  Balance
+                </div>
+
+                <div className="text-lg font-bold text-omni-emerald mb-3">
+                  {user.balance}
+                </div>
+
+                <button
+                  onClick={handleLogout}
+                  className="hidden lg:flex items-center gap-2 px-6 py-2 rounded-full font-bold 
                 bg-white/5 border border-white/10 text-white 
                 hover:bg-red-500/20 hover:border-red-400/40 
                 transition-all shadow-lg"
-              >
-                <LogOut size={18} />
-                Logout
-              </button>
+                >
+                  <LogOut size={18} />
+                  Logout
+                </button>
 
-            </div>
-          )}
+              </div>
+            )}
+          </div>
+
         </div>
-
       </div>
-    </div>
 
       {/* --- SIDEBAR --- */}
       <aside className="w-64 border-r border-white/5 bg-omni-dark-card/30 backdrop-blur-md hidden lg:flex flex-col p-6">
@@ -431,7 +449,7 @@ const ClientDashboard = () => {
         <header className="flex justify-between items-center mb-10">
           <div>
             <h1 className="text-2xl font-bold text-white">Welcome back, {user.name.split(' ')[0]}</h1>
-            <p className="text-gray-400 text-sm">Your income is protected in <span className="text-omni-emerald font-semibold">{user.zone}</span></p>
+            <p className="text-gray-400 text-sm">Your income is protected in <span className="text-omni-emerald font-semibold">{premiumPlan?.city || user.zone}</span></p>
           </div>
           <div className="flex items-center gap-4">
             <div className="text-right flex flex-col items-end">
@@ -466,7 +484,7 @@ const ClientDashboard = () => {
                 <span className="px-3 py-1 bg-omni-emerald text-omni-dark text-xs font-black rounded-full uppercase">Shield Active</span>
               </div>
               <h2 className="text-3xl font-bold text-white mb-2">OmniSight AI Protection</h2>
-              <p className="text-emerald-100/60 mb-8 max-w-sm">Active monitoring in {user.zone}. Weekly coverage is live.</p>
+              <p className="text-emerald-100/60 mb-8 max-w-sm">Active monitoring in {premiumPlan?.city || user.zone}. Weekly coverage is live.</p>
               <div className="mt-auto flex gap-4">
                 <button onClick={() => navigate("/pricing")} className="flex items-center gap-2 px-4 py-2 bg-omni-emerald text-black rounded-xl font-bold text-sm hover:bg-emerald-400 transition-all">
                   Buy More Plans <ArrowUpRight size={16} />
@@ -494,6 +512,51 @@ const ClientDashboard = () => {
           </div>
         </div>
 
+        {/* plan card */}
+        {premiumPlan && (
+          <div className="relative mb-6 rounded-2xl p-[1px] bg-gradient-to-r from-emerald-500/40 via-emerald-300/20 to-transparent">
+
+            <div className="relative bg-black/60 backdrop-blur-xl rounded-2xl p-5 border border-white/10">
+
+              {/* Glow dot */}
+              <div className="absolute top-3 right-3 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span className="text-xs text-emerald-400 font-medium">
+                  Active
+                </span>
+              </div>
+
+              {/* Header */}
+              <p className="text-xs uppercase tracking-widest text-gray-500 mb-1">
+                Current Subscription
+              </p>
+
+              {/* Plan Name */}
+              <div className="flex items-end gap-3 mb-2">
+                <h2 className="text-2xl font-bold text-white tracking-tight">
+                  {premiumPlan.title.toUpperCase()}
+                </h2>
+
+                <span className="px-2 py-1 text-xs rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                  Premium Access
+                </span>
+              </div>
+
+              {/* Price */}
+              <p className="text-emerald-400 text-lg font-semibold">
+                {premiumPlan.weekly}
+                <span className="text-gray-400 text-sm font-normal"> / week</span>
+              </p>
+
+              {/* Sub info */}
+              <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
+                <span>Billing active</span>
+                <span className="text-emerald-400">Protected Plan</span>
+              </div>
+
+            </div>
+          </div>
+        )}
 
         {/* live map */}
         <div className="mb-12">
