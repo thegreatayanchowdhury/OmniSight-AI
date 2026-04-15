@@ -48,9 +48,9 @@ class Subscription(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
-    plan = Column(String)  # basic / premium / elite
+    plan = Column(String(20))  # basic / premium / elite
     amount = Column(Integer)
-    city = Column(String)
-    status = Column(String, default="pending")  # pending / success
-    razorpay_order_id = Column(String)
-    razorpay_payment_id = Column(String)
+    city = Column(String(100))
+    status = Column(String(15), default="pending")  # pending / success
+    razorpay_order_id = Column(String(100))
+    razorpay_payment_id = Column(String(100))
