@@ -26,7 +26,7 @@ const PlanDashboard = () => {
         const data = await res.json();
 
         setPremiumPlan({
-          title: "Premium (Recommended)",
+          title: "Premium",
           weekly: `₹${data.weekly_premium}`,
           monthly: `₹${(data.weekly_premium * 4).toFixed(0)}`,
           coverage: `₹${data.coverage_limit}`,
@@ -42,16 +42,12 @@ const PlanDashboard = () => {
   try {
     const storedUser = JSON.parse(localStorage.getItem("user"));
 
-    await fetch(`${API_BASE_URL}/complete-onboarding`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        user_id: storedUser.id,
-        plan: plan.title.toLowerCase(), // basic / premium / elite
-      }),
-    });
+   await fetch(
+  `${API_BASE_URL}/complete-onboarding?user_id=${storedUser.id}&plan=${plan.title.toLowerCase()}`,
+  {
+    method: "POST",
+  }
+);
 
     //  Update localStorage instantly
     const updatedUser = {
@@ -114,7 +110,7 @@ const PlanDashboard = () => {
 
               {/* Title */}
               <h3 className="text-3xl font-bold mb-2">
-                Premium Plan 
+                Premium Plan (Recommended)
               </h3>
 
               <p className="text-gray-400 mb-6">
