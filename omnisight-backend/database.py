@@ -13,7 +13,6 @@ SQLALCHEMY_DATABASE_URL = os.getenv("MYSQL_ADDON_URI")
 # Fallback for local development
 if not SQLALCHEMY_DATABASE_URL:
     SQLALCHEMY_DATABASE_URL = "sqlite:///./omnisight.db"
-print("-- USING DB:", SQLALCHEMY_DATABASE_URL)
 # MySQL Configuration (Clever Cloud)
 if SQLALCHEMY_DATABASE_URL.startswith("mysql"):
     # Ensure correct driver
