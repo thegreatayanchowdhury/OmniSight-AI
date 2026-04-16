@@ -42,6 +42,7 @@ class FraudLog(Base):
     risk_level = Column(String(100))
     reasons = Column(String(100))
     timestamp = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
 class Subscription(Base):
     __tablename__ = "subscriptions"

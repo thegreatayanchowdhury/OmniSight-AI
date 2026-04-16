@@ -2,7 +2,11 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import sessionmaker, declarative_base
+from dotenv import load_dotenv
+import os
 
+
+load_dotenv()
 # Get DB URL from environment
 SQLALCHEMY_DATABASE_URL = os.getenv("MYSQL_ADDON_URI")
 

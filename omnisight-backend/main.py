@@ -17,7 +17,7 @@ from database import SessionLocal , get_db
 from pricing import calculate_weekly_premium
 from datetime import datetime, date
 from sqlalchemy import and_
-
+from sqlalchemy import func
 import threading
 from models import Base
 from database import engine
@@ -98,7 +98,7 @@ class SecurityCheckRequest(BaseModel):
     location: dict | None = None
 
 
-AQI_THRESHOLD = 230
+AQI_THRESHOLD = 200
 logging.basicConfig(level=logging.INFO)
 # --- STARTUP EVENT ---
 
@@ -359,99 +359,96 @@ def fetch_aqi(city: str = "Asansol"):
     except Exception as e:
         logging.error(f"Error fetching AQI: {e}")
         return random.randint(100, 400)
-    
+from sqlalchemy import func
+
 def delayed_aqi_process(city: str = "Asansol"):
+    db = None
+
     try:
         print("🔥 delayed_aqi_process STARTED")
 
-        time.sleep(5)  # keep small for testing
+        time.sleep(10)
 
-        print("⏳ Fetching AQI...")
         aqi = fetch_aqi(city)
         print(f"📊 AQI Value: {aqi}")
 
         breached = aqi > AQI_THRESHOLD
         print(f"🚨 Breached: {breached}")
 
-        payout_info = None
-
-        if breached:
-            logging.warning("Threshold breached")
-
-            db = SessionLocal()
-            logging.info("🗄️ DB session started")
-
-            users = db.query(User).filter(User.city == city).all()
-            logging.info(len(users))
-            logging.info(f"👥 Users found: {len(users)}")
-
-            event_type = "AQI"
-            value = aqi
-            successful_payouts = 0
-
-            print("⚙️ Checking kill switch...")
-            evaluate_kill_switch(db)
-
-            if kill_switch_status["active"]:
-                print(f"🚨 KILL SWITCH ACTIVE: {kill_switch_status['reason']}")
-                db.close()
-                return
-
-            for user in users:
-                print(f"➡️ Processing user {user.id}")
-
-                context = {
-                    "sudden_location_jump": False,
-                    "recent_activity": True,
-                    "is_emulator": False,
-                    "is_rooted": False,
-                    "suspicious_cluster": False,
-                    "network_mismatch": False
-                }
-
-                fraud_result = evaluate_claim(user, db, context)
-                print(f"🛡️ Risk: {fraud_result}")
-
-                if user.trust_score < 40:
-                    print("❌ Skipped: Low trust")
-                    continue
-
-                if fraud_result["risk_level"] == "HIGH":
-                    print("❌ Skipped: HIGH risk")
-                    continue
-
-                if fraud_result["risk_level"] == "MEDIUM":
-                    print("⚠️ Skipped: MEDIUM risk")
-                    continue
-
-                print("💰 Triggering payout...")
-                result = process_payout(event_type, value, user, db)
-
-                print(f"✅ Payout result: {result}")
-
-                if result:
-                    successful_payouts += 1
-
-            db.close()
-            print("🧹 DB session closed")
-
-            payout_info = {
-                "type": event_type,
-                "value": value,
-                "status": f"{successful_payouts} users paid"
-            }
-
-        else:
+        if not breached:
             print("✅ No breach")
-            payout_info = {
-                "type": "AQI",
-                "value": aqi,
-                "status": "No breach"
+
+            aqi_result_store.update({
+                "aqi": aqi,
+                "breached": False,
+                "payout": {
+                    "type": "AQI",
+                    "value": aqi,
+                    "status": "No breach"
+                },
+                "last_updated": datetime.now().isoformat()
+            })
+            return
+
+        # ✅ ONLY here DB is created
+        db = SessionLocal()
+        print("📌 DB:", db.bind.url)
+
+        logging.info("🗄️ DB session started")
+
+        #
+        # ✅ ACTUAL FILTER
+        users = db.query(User).filter(
+            func.trim(func.lower(User.city)) == city.lower().strip()
+        ).all()
+
+        print("👥 FILTERED USERS:", len(users))
+
+        event_type = "AQI"
+        value = aqi
+        successful_payouts = 0
+
+        print("⚙️ Checking kill switch...")
+        evaluate_kill_switch(db)
+
+        if kill_switch_status["active"]:
+            print(f"🚨 KILL SWITCH ACTIVE: {kill_switch_status['reason']}")
+            return
+
+        # ✅ LOOP ONLY ON FILTERED USERS
+        for user in users:
+            print(f"➡️ Processing user {user.id}")
+
+            context = {
+                "sudden_location_jump": False,
+                "recent_activity": True,
+                "is_emulator": False,
+                "is_rooted": False,
+                "suspicious_cluster": False,
+                "network_mismatch": False
             }
+
+            fraud_result = evaluate_claim(user, db, context)
+
+            if user.trust_score < 40:
+                continue
+            if fraud_result["risk_level"] in ["HIGH", "MEDIUM"]:
+                continue
+
+            result = process_payout(event_type, value, user, db)
+
+            if result:
+                successful_payouts += 1
+
+        payout_info = {
+            "type": event_type,
+            "value": value,
+            "status": f"{successful_payouts} users paid"
+        }
 
         aqi_result_store.update({
             "aqi": aqi,
-            "breached": breached,
+            "breached": True,
             "payout": payout_info,
             "last_updated": datetime.now().isoformat()
         })
@@ -463,6 +460,10 @@ def delayed_aqi_process(city: str = "Asansol"):
         print("❌ AQI Background Error:", e)
         traceback.print_exc()
 
+    finally:
+        if db:
+            db.close()
+            print("🧹 DB session closed")
 def calculate_device_risk(data: dict):
     risk = data.get("risk_score", 0)
 
