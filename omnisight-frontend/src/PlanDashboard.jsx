@@ -58,7 +58,6 @@ const PlanDashboard = () => {
     };
 
     localStorage.setItem("user", JSON.stringify(updatedUser));
-swer@we.me
     //  Redirect to dashboard
     navigate("/client/dashboard");
 
