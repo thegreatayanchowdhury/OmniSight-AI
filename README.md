@@ -11,7 +11,7 @@
 ![Contributions](https://img.shields.io/badge/Contributions-Welcome-brightgreen)
 ![Scikit-Learn](https://img.shields.io/badge/ML-ScikitLearn-orange)
 ![SQL](https://img.shields.io/badge/Database-SQL-lightgrey)
-
+![Android](https://img.shields.io/badge/Platform-Android-brightgreen)
 ### AI-Powered Income Protection Platform for India’s Gig Delivery Workforce
 
 OmniSight AI is an **AI-enabled parametric income protection platform** designed to safeguard the livelihoods of India's gig delivery workforce. The platform automatically detects external disruptions that prevent delivery partners from working and **triggers instant compensation without requiring manual claims**.
@@ -59,8 +59,8 @@ OmniSight AI is also available as a **Android application**, providing delivery 
 ## APK Download
 
 You can download and install the latest Android version below:
+[![Download APK](https://img.shields.io/badge/Download-APK-blue?style=for-the-badge&logo=android)](https://github.com/thegreatayanchowdhury/OmniSight-AI/releases/latest)
 
-**[Download OmniSight AI APK](https://github.com/thegreatayanchowdhury/OmniSight-AI/releases/latest)**  
 
 > ⚠️ Make sure to enable **"Install from Unknown Sources"** in your Android settings before installing.
 
