@@ -41,7 +41,26 @@ const PlanDashboard = () => {
   const handleBuy = async (plan) => {
   try {
     const storedUser = JSON.parse(localStorage.getItem("user"));
-    navigate("/buy", { state: { plan } });
+
+   navigate("/buy", { state: { plan } });
+   await fetch(
+  `${API_BASE_URL}/complete-onboarding?user_id=${storedUser.id}&plan=${plan.title.toLowerCase()}`,
+  {
+    method: "POST",
+  }
+);
+
+    //  Update localStorage instantly
+    const updatedUser = {
+      ...storedUser,
+      activity_tier: plan.title.toLowerCase(),
+      is_onboarded: 1,
+    };
+
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+    //  Redirect to dashboard
+    // navigate("/client/dashboard");
+
   } catch (err) {
     console.error("Plan selection error:", err);
   }

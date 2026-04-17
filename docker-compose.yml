@@ -1,0 +1,19 @@
+
+services:
+  backend:
+    build: ./omnisight-backend
+    container_name: omnisight-backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./omnisight-backend/.env
+    restart: always
+
+  frontend:
+    build: ./omnisight-frontend
+    container_name: omnisight-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: always

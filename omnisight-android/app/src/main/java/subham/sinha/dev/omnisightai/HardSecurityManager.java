@@ -350,7 +350,7 @@ public class HardSecurityManager {
             );
 
             Request request = new Request.Builder()
-                    .url("http://127.0.0.1:8000/security/check")
+                    .url("https://omnisight-ai-backend.onrender.com/security/check")
                     .post(body)
                     .build();
 
