@@ -42,6 +42,29 @@ It focuses on delivery partners working across **food delivery, e-commerce, and 
 
 ---
 
+
+
+
+OmniSight AI is also available as a **Android application**, providing delivery partners with real-time insights, alerts, and seamless access on the go.
+
+### Features on Android
+- Real-time disruption detection
+- Instant compensation alerts
+- Risk & income analytics dashboard
+- Secure authentication
+- Lightweight & fast performance
+
+---
+
+## APK Download
+
+You can download and install the latest Android version below:
+
+**[Download OmniSight AI APK](https://github.com/thegreatayanchowdhury/OmniSight-AI/releases/latest)**  
+
+> ⚠️ Make sure to enable **"Install from Unknown Sources"** in your Android settings before installing.
+
+---
 ## Problem Statement
 
 India’s platform-based delivery partners working with platforms such as **Zomato, Swiggy, Zepto, Amazon, Dunzo, and others** form the backbone of the digital economy.
