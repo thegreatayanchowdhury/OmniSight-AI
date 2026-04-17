@@ -41,11 +41,14 @@ const PlanDashboard = () => {
   const handleBuy = async (plan) => {
   try {
     const storedUser = JSON.parse(localStorage.getItem("user"));
-    navigate("/buy", { state: { plan } });
+
+   navigate("/buy", { state: { plan } });
+
   } catch (err) {
     console.error("Plan selection error:", err);
   }
-};
+};  
+
 
   if (!user) return null;
 

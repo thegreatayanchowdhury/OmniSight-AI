@@ -91,7 +91,6 @@ class SecurityCheckRequest(BaseModel):
     adb: bool = False
     rooted: bool = False
     emulator: bool = False
-    frida: bool = False
     debugger: bool = False
     developer_mode: bool = False
     hooking: bool = False
@@ -120,7 +119,9 @@ app.add_middleware(
         "http://localhost:5173",
         "https://omni-sight-ai.vercel.app",
         "https://omni-sight-ai-seven.vercel.app",
-        "http://127.0.0.1:5173"
+        "http://127.0.0.1:5173",
+         "http://localhost:3000",  
+        "http://127.0.0.1:3000"
 
 
     ],
