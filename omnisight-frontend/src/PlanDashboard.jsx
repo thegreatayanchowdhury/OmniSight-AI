@@ -47,7 +47,7 @@ const PlanDashboard = () => {
   } catch (err) {
     console.error("Plan selection error:", err);
   }
-};   navigate("/client/dashboard");
+};  
 
 
   if (!user) return null;
