@@ -710,7 +710,7 @@ This creates a stronger, smarter, and more scalable anti-spoofing system that ca
 ##  Pitch Deck  – OmniSight AI (Devtrails Hackathon)
 
 
-[Open Pitch Deck](https://drive.google.com/file/d/1E_-wW-cCrZIn8p3NfZdIgdUKW9j-BOIo/view?usp=drivesdk)
+[Open Pitch Deck](https://drive.google.com/file/d/1fyrmtvdjwAMy8wAJkRr9t5uK-JSv0fOa/view?usp=drivesdk)
 
 ---
 
